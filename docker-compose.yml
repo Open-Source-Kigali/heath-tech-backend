@@ -1,0 +1,45 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: clinicsync-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-clinicsync}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-clinicsync}
+      POSTGRES_DB: ${POSTGRES_DB:-clinicsync}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - clinicsync-db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-clinicsync} -d ${POSTGRES_DB:-clinicsync}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinicsync-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-clinicsync}:${POSTGRES_PASSWORD:-clinicsync}@db:5432/${POSTGRES_DB:-clinicsync}?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      DEVICE_JWT_SECRET: ${DEVICE_JWT_SECRET:-change-me-too}
+      DEVICE_JWT_EXPIRES_IN: ${DEVICE_JWT_EXPIRES_IN:-30d}
+      SYNC_PULL_MAX_LIMIT: ${SYNC_PULL_MAX_LIMIT:-500}
+      SYNC_FULL_RESYNC_THRESHOLD: ${SYNC_FULL_RESYNC_THRESHOLD:-50000}
+      THROTTLE_TTL_SECONDS: ${THROTTLE_TTL_SECONDS:-60}
+      THROTTLE_LIMIT: ${THROTTLE_LIMIT:-120}
+    ports:
+      - '${PORT:-3000}:3000'
+
+volumes:
+  clinicsync-db-data:

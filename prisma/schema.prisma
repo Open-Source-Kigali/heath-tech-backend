@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Clinic {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users          User[]
+  patients       Patient[]
+  appointments   Appointment[]
+  visits         Visit[]
+  labResults     LabResult[]
+  medicalHistory MedicalHistoryEvent[]
+  auditLogs      AuditLog[]
+  devices        Device[]
+  changeLogs     ChangeLog[]
+  syncConflicts  SyncConflict[]
+
+  @@map("clinics")
+}
+
+model Role {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId     String   @db.Uuid
+  email        String
+  passwordHash String
+  fullName     String
+  roleId       String   @db.Uuid
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+  role   Role   @relation(fields: [roleId], references: [id])
+
+  appointmentsAsProvider Appointment[] @relation("AppointmentProvider")
+  visitsAsProvider       Visit[]       @relation("VisitProvider")
+  devices                Device[]
+
+  @@unique([clinicId, email])
+  @@index([clinicId])
+  @@map("users")
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  OTHER
+  UNKNOWN
+}
+
+model Patient {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId    String    @db.Uuid
+  mrn         String
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime? @db.Date
+  sex         Sex       @default(UNKNOWN)
+  phone       String?
+  address     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  deletedAt     DateTime?
+  serverVersion BigInt    @default(0)
+  deviceId      String?   @db.Uuid
+
+  clinic         Clinic                @relation(fields: [clinicId], references: [id])
+  appointments   Appointment[]
+  visits         Visit[]
+  labResults     LabResult[]
+  medicalHistory MedicalHistoryEvent[]
+
+  @@unique([clinicId, mrn])
+  @@index([clinicId])
+  @@index([clinicId, updatedAt])
+  @@index([clinicId, deletedAt])
+  @@map("patients")
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+model Appointment {
+  id           String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId     String            @db.Uuid
+  patientId    String            @db.Uuid
+  providerId   String?           @db.Uuid
+  scheduledFor DateTime
+  status       AppointmentStatus @default(SCHEDULED)
+  reason       String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  deletedAt     DateTime?
+  serverVersion BigInt    @default(0)
+  deviceId      String?   @db.Uuid
+
+  clinic   Clinic  @relation(fields: [clinicId], references: [id])
+  patient  Patient @relation(fields: [patientId], references: [id])
+  provider User?   @relation("AppointmentProvider", fields: [providerId], references: [id])
+  visits   Visit[]
+
+  @@index([clinicId])
+  @@index([clinicId, patientId])
+  @@index([clinicId, updatedAt])
+  @@index([clinicId, deletedAt])
+  @@map("appointments")
+}
+
+model Visit {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId       String   @db.Uuid
+  patientId      String   @db.Uuid
+  appointmentId  String?  @db.Uuid
+  providerId     String?  @db.Uuid
+  visitDate      DateTime @default(now())
+  chiefComplaint String?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  deletedAt     DateTime?
+  serverVersion BigInt    @default(0)
+  deviceId      String?   @db.Uuid
+
+  clinic      Clinic       @relation(fields: [clinicId], references: [id])
+  patient     Patient      @relation(fields: [patientId], references: [id])
+  appointment Appointment? @relation(fields: [appointmentId], references: [id])
+  provider    User?        @relation("VisitProvider", fields: [providerId], references: [id])
+
+  @@index([clinicId])
+  @@index([clinicId, patientId])
+  @@index([clinicId, updatedAt])
+  @@index([clinicId, deletedAt])
+  @@map("visits")
+}
+
+model LabResult {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId       String   @db.Uuid
+  patientId      String   @db.Uuid
+  testCode       String
+  testName       String
+  value          String
+  unit           String?
+  referenceRange String?
+  resultedAt     DateTime @default(now())
+
+  amendsId  String?  @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deletedAt     DateTime?
+  serverVersion BigInt    @default(0)
+  deviceId      String?   @db.Uuid
+
+  clinic    Clinic      @relation(fields: [clinicId], references: [id])
+  patient   Patient     @relation(fields: [patientId], references: [id])
+  amends    LabResult?  @relation("LabResultAmendment", fields: [amendsId], references: [id])
+  amendedBy LabResult[] @relation("LabResultAmendment")
+
+  @@index([clinicId])
+  @@index([clinicId, patientId])
+  @@index([clinicId, deletedAt])
+  @@map("lab_results")
+}
+
+enum MedicalHistoryType {
+  DIAGNOSIS
+  ALLERGY
+  MEDICATION
+  PROCEDURE
+  VITAL
+  NOTE
+}
+
+model MedicalHistoryEvent {
+  id         String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId   String             @db.Uuid
+  patientId  String             @db.Uuid
+  type       MedicalHistoryType
+  summary    String
+  detail     String?
+  recordedAt DateTime           @default(now())
+
+  amendsId  String?  @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  deletedAt     DateTime?
+  serverVersion BigInt    @default(0)
+  deviceId      String?   @db.Uuid
+
+  clinic    Clinic                @relation(fields: [clinicId], references: [id])
+  patient   Patient               @relation(fields: [patientId], references: [id])
+  amends    MedicalHistoryEvent?  @relation("MedicalHistoryAmendment", fields: [amendsId], references: [id])
+  amendedBy MedicalHistoryEvent[] @relation("MedicalHistoryAmendment")
+
+  @@index([clinicId])
+  @@index([clinicId, patientId])
+  @@index([clinicId, deletedAt])
+  @@map("medical_history_events")
+}
+
+model AuditLog {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId    String  @db.Uuid
+  actorUserId String? @db.Uuid
+  action      String
+  entityType  String
+  entityId    String  @db.Uuid
+
+  clientTimestamp DateTime?
+
+  serverTimestamp DateTime @default(now())
+  metadata        Json?
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+
+  @@index([clinicId])
+  @@index([clinicId, entityType, entityId])
+  @@map("audit_logs")
+}
+
+enum SyncOperation {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum DeviceStatus {
+  ACTIVE
+  REVOKED
+}
+
+model ChangeLog {
+  seq             BigInt        @id @default(autoincrement())
+  entityType      String
+  entityId        String        @db.Uuid
+  operation       SyncOperation
+  clinicId        String        @db.Uuid
+  actorUserId     String?       @db.Uuid
+  deviceId        String?       @db.Uuid
+  clientTimestamp DateTime?
+  serverTimestamp DateTime      @default(now())
+
+  snapshot Json
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+
+  @@index([clinicId, seq])
+  @@index([entityType, entityId])
+  @@map("change_log")
+}
+
+model Device {
+  id            String       @id @db.Uuid
+  clinicId      String       @db.Uuid
+  userId        String?      @db.Uuid
+  name          String?
+  status        DeviceStatus @default(ACTIVE)
+  lastSyncedSeq BigInt       @default(0)
+  lastSeenAt    DateTime?
+  tokenIssuedAt DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  clinic          Clinic           @relation(fields: [clinicId], references: [id])
+  user            User?            @relation(fields: [userId], references: [id])
+  idempotencyKeys IdempotencyKey[]
+
+  @@index([clinicId])
+  @@map("devices")
+}
+
+model SyncConflict {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clinicId        String    @db.Uuid
+  entityType      String
+  entityId        String    @db.Uuid
+  losingDeviceId  String?   @db.Uuid
+  winningDeviceId String?   @db.Uuid
+  losingValue     Json
+  winningValue    Json
+  resolvedAt      DateTime  @default(now())
+  reviewedAt      DateTime?
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+
+  @@index([clinicId])
+  @@index([clinicId, entityType, entityId])
+  @@map("sync_conflicts")
+}
+
+enum IdempotencyResult {
+  ACCEPTED
+  REJECTED
+  CONFLICT
+}
+
+model IdempotencyKey {
+  deviceId       String            @db.Uuid
+  key            String
+  entityType     String
+  entityId       String            @db.Uuid
+  resultStatus   IdempotencyResult
+  resultSnapshot Json?
+  createdAt      DateTime          @default(now())
+
+  device Device @relation(fields: [deviceId], references: [id])
+
+  @@id([deviceId, key])
+  @@map("idempotency_keys")
+}
