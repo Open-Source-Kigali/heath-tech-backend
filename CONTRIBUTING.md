@@ -1,6 +1,6 @@
 # Contributing to ClinicSync Backend
 
-Thanks for your interest in contributing. This is the offline-first clinic
+Thanks for you're interest in contributing. This is the offline-first clinic
 management backend for [Open Source Kigali](https://github.com/Open-Source-Kigali),
 built with NestJS, TypeScript, Prisma, and PostgreSQL. Whether you are fixing a
 bug, adding a feature, or improving the docs, this guide will help you get set up
@@ -63,7 +63,7 @@ line should be:
 ```
 
 Common types: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `style`, `perf`.
-Keep the summary under 72 characters and add a body if the change needs context.
+Keep the summary under 72 charecters and add a body if the change needs context.
 
 ## Code style
 

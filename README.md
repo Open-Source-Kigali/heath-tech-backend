@@ -3,7 +3,7 @@
 An offline-first clinic management backend built with NestJS, TypeScript,
 PostgreSQL, and Prisma. It targets clinics in low-connectivity areas. The server
 is the source of truth and stays online. Clinic devices keep a local database,
-work while disconnected, and reconcile changes in both directions once they are
+work while disconnected, and reconsile changes in both directions once they are
 back online.
 
 ## Getting started
@@ -17,7 +17,7 @@ npm run db:seed        # optional demo clinic and admin login
 npm run start:dev
 ```
 
-The API runs on http://localhost:3000 and Swagger is available at /docs/api.
+The API runs on http://localhost:3000 and Swagger is availabe at /docs/api.
 
 If a local PostgreSQL already uses port 5432, set POSTGRES_PORT to another value
 (for example 5433) in .env and update DATABASE_URL to match.

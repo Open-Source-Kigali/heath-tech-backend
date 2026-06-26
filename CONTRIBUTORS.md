@@ -3,7 +3,7 @@
 Thanks to everyone who has contributed to ClinicSync Backend.
 
 This project is maintained by the [Open Source Kigali](https://github.com/Open-Source-Kigali)
-community. Contributions of all kinds are welcome, from code and tests to docs
+comunity. Contributions of all kinds are welcome, from code and tests to docs
 and bug reports.
 
 A full, up-to-date list of code contributors is available on the

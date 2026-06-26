@@ -20,7 +20,7 @@ This keeps the report between you and the maintainers until a fix is ready.
 
 When reporting, please include:
 
-- A clear description of the vulnerability
+- A clear description of the vulnerabilty
 - Steps to reproduce, or a proof of concept if possible
 - The affected endpoint, file, or area of the codebase
 - Any potential impact you have identified
