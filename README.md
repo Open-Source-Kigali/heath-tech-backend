@@ -55,3 +55,14 @@ DATABASE_URL="$TEST_DB" npm run test:e2e
 - npm run test:e2e
 - npm run prisma:migrate
 - npm run db:seed
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup,
+branching, and pull request guidelines, and please follow the
+[Code of Conduct](CODE_OF_CONDUCT.md). To report a security issue, read
+[SECURITY.md](SECURITY.md).
+
+## License
+
+Released under the [MIT License](LICENSE).
