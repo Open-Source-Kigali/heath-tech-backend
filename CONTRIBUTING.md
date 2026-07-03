@@ -63,7 +63,7 @@ line should be:
 ```
 
 Common types: `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `style`, `perf`.
-Keep the summary under 72 charecters and add a body if the change needs context.
+Keep the summary under 72 characters and add a body if the change needs context.
 
 ## Code style
 
