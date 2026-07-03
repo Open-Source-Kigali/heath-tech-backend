@@ -46,7 +46,7 @@ See `.env.example` for the full list.
 <summary><b>Database</b></summary>
 <br>
 
-PostgreSQL runs locally via Docker. Make sure Docker is intalled, then:
+PostgreSQL runs locally via Docker. Make sure Docker is installed, then:
 
 ```bash
 docker compose up -d db      # start Postgres
