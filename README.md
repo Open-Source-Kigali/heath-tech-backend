@@ -2,7 +2,7 @@
 
 [![NestJS](https://img.shields.io/badge/NestJS-Framework-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com) [![TypeScript](https://img.shields.io/badge/TypeScript-Language-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org) [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io) [![Swagger](https://img.shields.io/badge/Swagger-APIdocs-green?logo=swagger&logoColor=white)](https://swagger.io) [![Docker](https://img.shields.io/badge/Docker-Containerization-2496ED?logo=docker&logoColor=white)](https://www.docker.com) ●• [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![GitHub forks](https://img.shields.io/github/forks/Open-Source-Kigali/heath-tech-backend?style=social) ![GitHub stars](https://img.shields.io/github/stars/Open-Source-Kigali/heath-tech-backend?style=social)
 
-Offline-first clinic management backend for [Open Source Kigali](https://github.com/Open-Source-Kigali). Built with NestJS, TypeScript, Prisma, and PostgreSQL. Clinic devices work while disconnected and reconcile changes through a bidirectional sync protocal when they are back online.
+Offline-first clinic management backend for [Open Source Kigali](https://github.com/Open-Source-Kigali). Built with NestJS, TypeScript, Prisma, and PostgreSQL. Clinic devices work while disconnected and reconcile changes through a bidirectional sync protocol when they are back online.
 
 ## Getting started
 
