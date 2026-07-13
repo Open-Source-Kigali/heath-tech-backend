@@ -11,7 +11,7 @@ We are committed to fostering an open and collaborative environment focused on l
 Examples of behavior that contributes to a positive environment include:
 
 - Being respectful and constructive in discussions and code reviews
-- Welcomming newcomers and helping others learn
+- Welcoming newcomers and helping others learn
 - Giving and receiving feedback professionally
 - Assuming good intent while still communicating clearly
 - Respecting differing viewpoints and experiences
